@@ -2329,27 +2329,27 @@ public class BlockedListNotifier implements ApplicationListener<BlockedListEvent
 
     - If your method should listen to several events or if you want to define it with no parameter at all, the event types can also be specified on the annotation itself. The following example shows how to do so:
     ```
-    @EventListener({ContextStartedEvent.class, ContextRefreshedEvent.class})
-    public void handleContextStart() {
-        // ...
-    }
+        @EventListener({ContextStartedEvent.class, ContextRefreshedEvent.class})
+        public void handleContextStart() {
+            // ...
+        }
     ```
     - It is also possible to add additional runtime filtering by using the condition attribute of the annotation that defines a SpEL expression , which should match to actually invoke the method for a particular event.
 
     - The following example shows how our notifier can be rewritten to be invoked only if the content attribute of the event is equal to my-event:
     ```
-    @EventListener(condition = "#blEvent.content == 'my-event'")
-    public void processBlockedListEvent(BlockedListEvent blockedListEvent) {
-        // notify appropriate parties via notificationAddress...
-    }
+        @EventListener(condition = "#blEvent.content == 'my-event'")
+        public void processBlockedListEvent(BlockedListEvent blockedListEvent) {
+            // notify appropriate parties via notificationAddress...
+        }
     ```
     - Each SpEL expression evaluates against a dedicated context. The following table lists the items made available to the context so that you can use them for conditional event processing:
     
-    |Name|Location|Description|Example|
-    |---|---|---|---|---|
-    |Event|root object|The actual ApplicationEvent.|#root.event or event|
-    |Arguments array|root object|The arguments (as an object array) used to invoke the method.|#root.args or args; args[0] to access the first argument, etc.|
-    |Argument name|evaluation context|The name of any of the method arguments. If, for some reason, the names are not available (for example, because there is no debug information in the compiled byte code), individual arguments are also available using the #a<#arg> syntax where <#arg> stands for the argument index (starting from 0).|#blEvent or #a0 (you can also use #p0 or #p<#arg> parameter notation as an alias|
+        |Name|Location|Description|Example|
+        |---|---|---|---|---|
+        |Event|root object|The actual ApplicationEvent.|#root.event or event|
+        |Arguments array|root object|The arguments (as an object array) used to invoke the method.|#root.args or args; args[0] to access the first argument, etc.|
+        |Argument name|evaluation context|The name of any of the method arguments. If, for some reason, the names are not available (for example, because there is no debug information in the compiled byte code), individual arguments are also available using the #a<#arg> syntax where <#arg> stands for the argument index (starting from 0).|#blEvent or #a0 (you can also use #p0 or #p<#arg> parameter notation as an alias|
 
     - Note that #root.event gives you access to the underlying event, even if your method signature actually refers to an arbitrary object that was published.
 
@@ -2382,34 +2382,34 @@ public class BlockedListNotifier implements ApplicationListener<BlockedListEvent
 - Ordering Listeners
     - If you need one listener to be invoked before another one, you can add the @Order annotation to the method declaration, as the following example shows:
     ```
-    @EventListener
-    @Order(42)
-    public void processBlockedListEvent(BlockedListEvent event) {
-        // notify appropriate parties via notificationAddress...
-    }
+        @EventListener
+        @Order(42)
+        public void processBlockedListEvent(BlockedListEvent event) {
+            // notify appropriate parties via notificationAddress...
+        }
     ```
 - Generic Events
     - You can also use generics to further define the structure of your event. Consider using an EntityCreatedEvent<T> where T is the type of the actual entity that got created. For example, you can create the following listener definition to receive only EntityCreatedEvent for a Person:
     ```
-    @EventListener
-    public void onPersonCreated(EntityCreatedEvent<Person> event) {
-        // ...
-    }
+        @EventListener
+        public void onPersonCreated(EntityCreatedEvent<Person> event) {
+            // ...
+        }
     ```
     - Due to type erasure, this works only if the event that is fired resolves the generic parameters on which the event listener filters (that is, something like class PersonCreatedEvent extends EntityCreatedEvent<Person> { …​ }).
 
     - In certain circumstances, this may become quite tedious if all events follow the same structure (as should be the case for the event in the preceding example). In such a case, you can implement ResolvableTypeProvider to guide the framework beyond what the runtime environment provides. The following event shows how to do so:
     ```
-    public class EntityCreatedEvent<T> extends ApplicationEvent implements ResolvableTypeProvider {
-        public EntityCreatedEvent(T entity) {
-            super(entity);
-        }
+        public class EntityCreatedEvent<T> extends ApplicationEvent implements ResolvableTypeProvider {
+            public EntityCreatedEvent(T entity) {
+                super(entity);
+            }
 
-        @Override
-        public ResolvableType getResolvableType() {
-            return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getSource()));
+            @Override
+            public ResolvableType getResolvableType() {
+                return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getSource()));
+            }
         }
-    }
     ```
     - This works not only for ApplicationEvent but any arbitrary object that you send as an event.
 
@@ -2428,14 +2428,14 @@ public class BlockedListNotifier implements ApplicationListener<BlockedListEvent
 
 - You can register an ApplicationContext by using the ContextLoaderListener, as the following example shows:
 ```
-<context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>/WEB-INF/daoContext.xml /WEB-INF/applicationContext.xml</param-value>
-</context-param>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/daoContext.xml /WEB-INF/applicationContext.xml</param-value>
+    </context-param>
 
-<listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-</listener>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
 ```
 - The listener inspects the contextConfigLocation parameter. If the parameter does not exist, the listener uses /WEB-INF/applicationContext.xml as a default. When the parameter does exist, the listener separates the String by using predefined delimiters (comma, semicolon, and whitespace) and uses the values as locations where application contexts are searched. Ant-style path patterns are supported as well. Examples are /WEB-INF/*Context.xml (for all files with names that end with Context.xml and that reside in the WEB-INF directory) and /WEB-INF/**/*Context.xml (for all such files in any subdirectory of WEB-INF).
 
@@ -2473,25 +2473,25 @@ public class BlockedListNotifier implements ApplicationListener<BlockedListEvent
 
     - The following table lists features provided by the BeanFactory and ApplicationContext interfaces and implementations.
 
-    |Feature|BeanFactory|ApplicationContext|
-    |---|---|---|
-    |Bean instantiation/wiring|Yes|Yes|
-    |Integrated lifecycle management|No|Yes|
-    |Automatic BeanPostProcessor registration|No|Yes|
-    |Automatic BeanFactoryPostProcessor registration|No|Yes|
-    |Convenient MessageSource access (for internalization)|No|Yes|
-    |Built-in ApplicationEvent publication mechanism|No|Yes|
+        |Feature|BeanFactory|ApplicationContext|
+        |---|---|---|
+        |Bean instantiation/wiring|Yes|Yes|
+        |Integrated lifecycle management|No|Yes|
+        |Automatic BeanPostProcessor registration|No|Yes|
+        |Automatic BeanFactoryPostProcessor registration|No|Yes|
+        |Convenient MessageSource access (for internalization)|No|Yes|
+        |Built-in ApplicationEvent publication mechanism|No|Yes|
 
     - To explicitly register a bean post-processor with a DefaultListableBeanFactory, you need to programmatically call addBeanPostProcessor, as the following example shows:
     ```
-    DefaultListableBeanFactory factory = new DefaultListableBeanFactory();
-    // populate the factory with bean definitions
+        DefaultListableBeanFactory factory = new DefaultListableBeanFactory();
+        // populate the factory with bean definitions
 
-    // now register any needed BeanPostProcessor instances
-    factory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
-    factory.addBeanPostProcessor(new MyBeanPostProcessor());
+        // now register any needed BeanPostProcessor instances
+        factory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
+        factory.addBeanPostProcessor(new MyBeanPostProcessor());
 
-    // now start using the factory
+        // now start using the factory
     ```
     - In both cases, the explicit registration steps are inconvenient, which is why the various ApplicationContext variants are preferred over a plain DefaultListableBeanFactory in Spring-backed applications, especially when relying on BeanFactoryPostProcessor and BeanPostProcessor instances for extended container functionality in a typical enterprise setup.
 
